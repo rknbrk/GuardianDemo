@@ -1,26 +1,18 @@
 package com.erkanberk.guardiandemo;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 @RestController
 public class APIController {
@@ -84,6 +76,13 @@ public class APIController {
         uriParams.add("toDate",  env.getProperty("api.transactions.to"));
         uriParams.add("merchant",  env.getProperty("api.transactions.merchant"));
         uriParams.add("acquirer",  env.getProperty("api.transactions.acquirer"));
+        //uriParams.add("status",  env.getProperty("api.transactions.status"));
+        //uriParams.add("operation",  env.getProperty("api.transactions.operation"));
+        //uriParams.add("paymentMethod",  env.getProperty("api.transactions.method"));
+        //uriParams.add("errorCode",  env.getProperty("api.transactions.ecode"));
+        //uriParams.add("filterField",  env.getProperty("api.transactions.ffield"));
+        //uriParams.add("filterValue",  env.getProperty("api.transactions.fvalue"));
+        //uriParams.add("page",  env.getProperty("api.transactions.page"));
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", jsonObj.getString("token"));
@@ -110,6 +109,26 @@ public class APIController {
         HttpEntity<?> request = new HttpEntity<Object>(uriParams,headers);
 
         String responseString = restTemplate.postForObject(env.getProperty("api.transactions.detail.url"),request,String.class,uriParams);
+
+
+        return responseString;
+
+    }
+
+    @GetMapping("/client")
+    public String getClient() throws JSONException {
+
+        restTemplate = new RestTemplate();
+        JSONObject jsonObj = new JSONObject(getLogin());
+
+        MultiValueMap<String, String> uriParams = new LinkedMultiValueMap<String, String>();
+        uriParams.add("transactionId",   env.getProperty("api.transactions.id"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", jsonObj.getString("token"));
+        HttpEntity<?> request = new HttpEntity<Object>(uriParams,headers);
+
+        String responseString = restTemplate.postForObject(env.getProperty("api.client.url"),request,String.class,uriParams);
 
 
         return responseString;
