@@ -96,4 +96,23 @@ public class APIController {
 
     }
 
+    @GetMapping("/detail")
+    public String getTransactionDetail() throws JSONException {
+
+        restTemplate = new RestTemplate();
+        JSONObject jsonObj = new JSONObject(getLogin());
+
+        MultiValueMap<String, String> uriParams = new LinkedMultiValueMap<String, String>();
+        uriParams.add("transactionId",   env.getProperty("api.transactions.id"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", jsonObj.getString("token"));
+        HttpEntity<?> request = new HttpEntity<Object>(uriParams,headers);
+
+        String responseString = restTemplate.postForObject(env.getProperty("api.transactions.detail.url"),request,String.class,uriParams);
+
+
+        return responseString;
+
+    }
 }
