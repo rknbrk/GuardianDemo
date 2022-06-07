@@ -1,6 +1,8 @@
 package com.erkanberk.guardiandemo;
 
 import com.fasterxml.jackson.databind.util.JSONPObject;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -27,8 +29,7 @@ public class APIController {
     private RestTemplate restTemplate;
     @Autowired
     private Environment env;
-    @Value( "${api.login.url}" )
-    private String loginurl;
+
 
     @GetMapping("/login")
     public String getLogin(){
@@ -42,12 +43,35 @@ public class APIController {
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<?> request = new HttpEntity<Object>(uriParams,headers);
 
-        String responseString = restTemplate.postForObject(loginurl,request,String.class,uriParams);
+        String responseString = restTemplate.postForObject(env.getProperty("api.login.url"),request,String.class,uriParams);
 
 
         return responseString;
 
     }
 
+    @GetMapping("/report")
+    public String getTransactionReport() throws JSONException {
+
+        restTemplate = new RestTemplate();
+        JSONObject jsonObj = new JSONObject(getLogin());
+
+        MultiValueMap<String, String> uriParams = new LinkedMultiValueMap<String, String>();
+        uriParams.add("fromDate",   env.getProperty("api.transactions.from"));
+        uriParams.add("toDate",  env.getProperty("api.transactions.to"));
+        uriParams.add("merchant",  env.getProperty("api.transactions.merchant"));
+        uriParams.add("acquirer",  env.getProperty("api.transactions.acquirer"));
+
+        HttpHeaders headers = new HttpHeaders();
+        System.out.println("token:"+jsonObj.getString("token"));
+        headers.add("Authorization", jsonObj.getString("token"));
+        HttpEntity<?> request = new HttpEntity<Object>(uriParams,headers);
+
+        String responseString = restTemplate.postForObject(env.getProperty("api.transactions.url"),request,String.class,uriParams);
+
+
+        return responseString;
+
+    }
 
 }
