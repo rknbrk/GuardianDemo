@@ -63,11 +63,33 @@ public class APIController {
         uriParams.add("acquirer",  env.getProperty("api.transactions.acquirer"));
 
         HttpHeaders headers = new HttpHeaders();
-        System.out.println("token:"+jsonObj.getString("token"));
         headers.add("Authorization", jsonObj.getString("token"));
         HttpEntity<?> request = new HttpEntity<Object>(uriParams,headers);
 
-        String responseString = restTemplate.postForObject(env.getProperty("api.transactions.url"),request,String.class,uriParams);
+        String responseString = restTemplate.postForObject(env.getProperty("api.transactions.report.url"),request,String.class,uriParams);
+
+
+        return responseString;
+
+    }
+
+    @GetMapping("/list")
+    public String getTransactionList() throws JSONException {
+
+        restTemplate = new RestTemplate();
+        JSONObject jsonObj = new JSONObject(getLogin());
+
+        MultiValueMap<String, String> uriParams = new LinkedMultiValueMap<String, String>();
+        uriParams.add("fromDate",   env.getProperty("api.transactions.from"));
+        uriParams.add("toDate",  env.getProperty("api.transactions.to"));
+        uriParams.add("merchant",  env.getProperty("api.transactions.merchant"));
+        uriParams.add("acquirer",  env.getProperty("api.transactions.acquirer"));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", jsonObj.getString("token"));
+        HttpEntity<?> request = new HttpEntity<Object>(uriParams,headers);
+
+        String responseString = restTemplate.postForObject(env.getProperty("api.transactions.list.url"),request,String.class,uriParams);
 
 
         return responseString;
